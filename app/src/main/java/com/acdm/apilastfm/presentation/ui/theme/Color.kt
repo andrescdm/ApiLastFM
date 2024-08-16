@@ -1,4 +1,4 @@
-package com.acdm.apilastfm.ui.theme
+package com.acdm.apilastfm.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
