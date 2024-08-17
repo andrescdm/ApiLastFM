@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Api Last FM</string>
+    <string name="listeners">%1$s de oyentes.</string>
+    <string name="retry_loading">Volver a cargar</string>
+    <string name="photo">photo</string>
 </resources>

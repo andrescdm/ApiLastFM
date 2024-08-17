@@ -12,15 +12,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 class ApiViewModel @Inject constructor(
     private val apiUseCase: ApiUseCase,
-
 ) : ViewModel() {
     private val _state = MutableStateFlow(ApiState())
     val state: StateFlow<ApiState> = _state
-
 
     fun processIntent(intent: LastFMArtistIntent) {
         when (intent) {
@@ -33,7 +30,7 @@ class ApiViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoadingApi = true)
             try {
                 val listArtist = apiUseCase.invoke()
-                _state.value = _state.value.copy(lastFMArtist = listArtist, isLoadingApi = false)
+                _state.value = _state.value.copy(topArtists = listArtist, isLoadingApi = false)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     error = e.message ?: Constans.UNKNOWN_ERROR,

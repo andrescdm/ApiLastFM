@@ -3,24 +3,38 @@ package com.acdm.apilastfm
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
+import androidx.activity.viewModels
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.acdm.apilastfm.presentation.ui.ContentPrincipalView
 import com.acdm.apilastfm.presentation.ui.theme.ApiLastFMTheme
+import com.acdm.apilastfm.presentation.viewmodel.ApiViewModel
+import com.example.pruebatecnicabolsiyo.core.model.Routes
+import com.example.pruebatecnicabolsiyo.domain.Constans
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val apiViewModel: ApiViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ApiLastFMTheme {
                 val navController = rememberNavController()
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-
+                NavHost(navController = navController, startDestination = Routes.Screen1.routes) {
+                    composable(Routes.Screen1.routes) {
+                        ContentPrincipalView(apiViewModel,navController)
+                    }
+                    composable(
+                        Routes.Screen2.routes,
+                        arguments = listOf(navArgument(Constans.ID) { type = NavType.IntType })
+                    ) { backStackEntry ->
+                        //SEGUNDA PANTALLA
+                    }
                 }
             }
         }
