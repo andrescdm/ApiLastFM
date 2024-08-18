@@ -1,10 +1,10 @@
 package com.acdm.apilastfm.domain.state
 
-import com.acdm.apilastfm.core.model.artist.TopArtists
+import com.acdm.apilastfm.core.model.songs.TopTracksResponse
 import com.example.pruebatecnicabolsiyo.domain.Constans
 
-data class ApiState(
+data class ApiStateSongs(
     val isLoadingApi: Boolean = false,
-    val topArtists: TopArtists? = null,
+    val topSongs: TopTracksResponse? = null,
     val error: String = Constans.ERROR_MESSAGE
 )

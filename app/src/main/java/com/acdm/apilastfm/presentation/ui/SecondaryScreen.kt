@@ -2,7 +2,6 @@ package com.acdm.apilastfm.presentation.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,46 +31,44 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.acdm.apilastfm.R
-import com.acdm.apilastfm.core.model.artist.Artist
-import com.acdm.apilastfm.presentation.intent.LastFMArtistIntent
+import com.acdm.apilastfm.core.model.songs.Track
+import com.acdm.apilastfm.presentation.intent.LastFMSongIntent
 import com.acdm.apilastfm.presentation.ui.theme.AppColors
-import com.acdm.apilastfm.presentation.viewmodel.ApiViewModel
-import com.example.pruebatecnicabolsiyo.core.model.Routes
-
+import com.acdm.apilastfm.presentation.viewmodel.ApiViewModelSongs
 
 @Composable
-fun ContentPrincipalView(
-    apiViewModel: ApiViewModel, navController: NavHostController
+fun ContentSecondaryScreen(
+    apiViewModelSongs: ApiViewModelSongs,
+    navController: NavHostController,
+    id: String
 ) {
-
-    val artistFMStates by apiViewModel.state.collectAsState()
-
-    if (artistFMStates.isLoadingApi) {
+    val songsFMStates by apiViewModelSongs.stateSongs.collectAsState()
+    if (songsFMStates.isLoadingApi) {
         Column(
-            Modifier.fillMaxSize()
-                .background(AppColors.BackgroundColor),
+            Modifier
+                .background(AppColors.BackgroundColor)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             //  LinearProgressIndicator()
         }
-    } else if (artistFMStates.topArtists != null) {
+    } else if (songsFMStates.topSongs != null) {
 
         Column(
             Modifier
-                .fillMaxWidth()
-                .background(AppColors.BackgroundColor),
+                .fillMaxSize()
+                .background(AppColors.BackgroundColor)
         ) {
             Spacer(modifier = Modifier.padding(4.dp))
             Text(
                 text = stringResource(
-                    R.string.top_10,
-                    artistFMStates.topArtists!!.topartists.attr.country
+                    R.string.top_5_songs,
+                    songsFMStates.topSongs!!.toptracks.track[0].artist.name
                 ),
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp,
@@ -79,17 +76,17 @@ fun ContentPrincipalView(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 color = AppColors.PrimaryTextColor,
-            )
+
+                )
             Spacer(modifier = Modifier.padding(4.dp))
             LazyVerticalGrid(columns = GridCells.Fixed(1),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
 
                 content = {
-                    items(artistFMStates.topArtists!!.topartists.artist.size) {
-                        ItemArtist(
-                            artistFMStates.topArtists!!.topartists.artist[it],
-                            navController,
+                    items(songsFMStates.topSongs!!.toptracks.track.size) {
+                        ItemSongs(
+                            songsFMStates.topSongs!!.toptracks.track[it],
                         )
                     }
                 })
@@ -97,40 +94,27 @@ fun ContentPrincipalView(
 
 
     } else {
-        FetchArtistTopButton(apiViewModel)
+        FetchSongsTopButton(apiViewModelSongs, id)
     }
 
     LaunchedEffect(false) {
-        apiViewModel.processIntent(LastFMArtistIntent.FetchArtistTop)
+        apiViewModelSongs.processIntent(LastFMSongIntent.FetchSongsTop(id))
     }
 }
 
-
 @Composable
-fun ItemArtist(
-    artistFMArtist: Artist,
-    navController: NavHostController,
+fun ItemSongs(
+    songsFMArtist: Track,
 ) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
             .padding(8.dp)
     ) {
-        Card(shape = MaterialTheme.shapes.medium,
+        Card(
+            shape = MaterialTheme.shapes.medium,
             modifier = Modifier
-                .clickable {
-                    navController.navigate(Routes.Screen2.createRoute(id = artistFMArtist.name)) {
-                        popUpTo(
-                            Routes.Screen2.createRoute(
-                                id = artistFMArtist.name
-                            )
-                        ) {
-                            inclusive = false
-                        }
-                    }
-
-                }
-                .height(80.dp)
+                .height(100.dp)
                 .fillMaxWidth()
         )
         {
@@ -141,7 +125,7 @@ fun ItemArtist(
             )
             {
                 Image(
-                    painterResource(id = R.drawable.baseline_library_music_24),
+                    painterResource(id = R.drawable.baseline_music_note_24),
                     contentDescription = stringResource(R.string.icon),
                     modifier = Modifier
                         .width(80.dp)
@@ -156,10 +140,11 @@ fun ItemArtist(
                      contentScale = ContentScale.FillHeight
                  )*/
                 Spacer(modifier = Modifier.padding(4.dp))
-                DescriptionArtist(
-                    name = artistFMArtist.name,
-                    listeners = artistFMArtist.listeners,
-                    url = artistFMArtist.url
+                DescriptionSong(
+                    name = songsFMArtist.name,
+                    playcount = songsFMArtist.playcount,
+                    listeners = songsFMArtist.listeners,
+                    url = songsFMArtist.url
                 )
             }
         }
@@ -167,7 +152,31 @@ fun ItemArtist(
 }
 
 @Composable
-fun DescriptionArtist(name: String, listeners: String, url: String) {
+fun FetchSongsTopButton(apiViewModelSongs: ApiViewModelSongs, id: String) {
+    val songsStates by apiViewModelSongs.stateSongs.collectAsState()
+    Column(
+        Modifier
+            .background(AppColors.BackgroundColor)
+            .fillMaxSize()
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Error: " + songsStates.error,
+            textAlign = TextAlign.Center,
+            color = AppColors.PrimaryTextColor
+        )
+        Spacer(modifier = Modifier.padding(8.dp))
+        Button(modifier = Modifier.background(AppColors.ButtonColor),
+            onClick = { apiViewModelSongs.processIntent(LastFMSongIntent.FetchSongsTop(id)) }) {
+            Text(text = stringResource(R.string.retry_loading))
+        }
+    }
+}
+
+@Composable
+fun DescriptionSong(name: String, playcount: String, listeners: String, url: String) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -178,9 +187,18 @@ fun DescriptionArtist(name: String, listeners: String, url: String) {
             fontSize = 20.sp,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Bold,
+            maxLines = 1,
             color = AppColors.PrimaryTextColor
         )
         Spacer(modifier = Modifier.padding(4.dp))
+        Text(
+            text = stringResource(R.string.playcount, playcount),
+            textAlign = TextAlign.Left,
+            fontSize = 10.sp,
+            fontFamily = FontFamily.Monospace,
+            color = AppColors.SecondaryTextColor
+        )
+        Spacer(modifier = Modifier.padding(2.dp))
         Text(
             text = stringResource(R.string.listeners, listeners),
             textAlign = TextAlign.Left,
@@ -199,43 +217,3 @@ fun DescriptionArtist(name: String, listeners: String, url: String) {
         )
     }
 }
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun viewComposable() {
-    DescriptionArtist(
-        name = "andres",
-        listeners = "Diaz",
-        url = "www.andres.com.co"
-    )
-}
-
-@Composable
-fun FetchArtistTopButton(apiViewModel: ApiViewModel) {
-    val artistsStates by apiViewModel.state.collectAsState()
-    Column(
-        Modifier
-            .background(AppColors.BackgroundColor)
-            .fillMaxSize()
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Error: " + artistsStates.error,
-            textAlign = TextAlign.Center,
-            color = AppColors.PrimaryTextColor
-        )
-        Spacer(modifier = Modifier.padding(8.dp))
-        Button(
-            modifier = Modifier.background(AppColors.ButtonColor),
-            onClick = { apiViewModel.processIntent(LastFMArtistIntent.FetchArtistTop) }) {
-            Text(
-                text = stringResource(R.string.retry_loading),
-                color = AppColors.SecondaryTextColor
-            )
-        }
-    }
-}
-
-

@@ -1,4 +1,4 @@
-package com.acdm.apilastfm.core.model
+package com.acdm.apilastfm.core.model.artist
 
 import com.google.gson.annotations.SerializedName
 

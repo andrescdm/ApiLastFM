@@ -3,4 +3,8 @@
     <string name="listeners">%1$s de oyentes.</string>
     <string name="retry_loading">Volver a cargar</string>
     <string name="photo">photo</string>
+    <string name="top_10">Top 10 %1$s</string>
+    <string name="icon">Icon</string>
+    <string name="top_5_songs">Top 5 canciones de %1$s</string>
+    <string name="playcount">%1$s de reproducciones</string>
 </resources>
