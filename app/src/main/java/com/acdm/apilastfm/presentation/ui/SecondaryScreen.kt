@@ -3,7 +3,6 @@ package com.acdm.apilastfm.presentation.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,12 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,15 +25,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.acdm.apilastfm.R
 import com.acdm.apilastfm.core.model.songs.Track
 import com.acdm.apilastfm.presentation.intent.LastFMSongIntent
@@ -43,7 +42,6 @@ import com.acdm.apilastfm.presentation.viewmodel.ApiViewModelSongs
 @Composable
 fun ContentSecondaryScreen(
     apiViewModelSongs: ApiViewModelSongs,
-    navController: NavHostController,
     id: String
 ) {
     val songsFMStates by apiViewModelSongs.stateSongs.collectAsState()
@@ -55,7 +53,18 @@ fun ContentSecondaryScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            //  LinearProgressIndicator()
+            CircularProgressIndicator(
+                modifier = Modifier.size(50.dp),
+                color = AppColors.CircularProgressColor,
+                strokeWidth = 4.dp
+            )
+            Text(
+                text = stringResource(R.string.loading),
+                fontSize = 20.sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                color = AppColors.PrimaryTextColor,
+            )
         }
     } else if (songsFMStates.topSongs != null) {
 
@@ -106,48 +115,40 @@ fun ContentSecondaryScreen(
 fun ItemSongs(
     songsFMArtist: Track,
 ) {
-    Box(
+
+    Card(
+        shape = MaterialTheme.shapes.medium,
         modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .padding(8.dp)
-    ) {
-        Card(
-            shape = MaterialTheme.shapes.medium,
+            .height(100.dp)
+            .fillMaxWidth()
+            .padding(start = 8.dp,end = 8.dp)
+    )
+    {
+        Row(
             modifier = Modifier
                 .height(100.dp)
                 .fillMaxWidth()
+                .background(AppColors.CardBackgroundColor)
         )
         {
-            Row(
+            Image(
+                painterResource(id = R.drawable.baseline_music_note_24),
+                contentDescription = stringResource(R.string.icon),
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(AppColors.CardBackgroundColor)
-            )
-            {
-                Image(
-                    painterResource(id = R.drawable.baseline_music_note_24),
-                    contentDescription = stringResource(R.string.icon),
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(70.dp)
-                        .align(Alignment.CenterVertically),
+                    .width(80.dp)
+                    .height(70.dp)
+                    .align(Alignment.CenterVertically),
 
-                    )
-                /* AsyncImage(
-                     modifier = Modifier.fillMaxHeight(),
-                     model = artistFMArtist.image[1].text,
-                     contentDescription = stringResource(R.string.photo),
-                     contentScale = ContentScale.FillHeight
-                 )*/
-                Spacer(modifier = Modifier.padding(4.dp))
-                DescriptionSong(
-                    name = songsFMArtist.name,
-                    playcount = songsFMArtist.playcount,
-                    listeners = songsFMArtist.listeners,
-                    url = songsFMArtist.url
                 )
-            }
+            Spacer(modifier = Modifier.padding(4.dp))
+            DescriptionSong(
+                name = songsFMArtist.name,
+                playcount = songsFMArtist.playcount,
+                listeners = songsFMArtist.listeners,
+                url = songsFMArtist.url
+            )
         }
+
     }
 }
 
@@ -178,13 +179,13 @@ fun FetchSongsTopButton(apiViewModelSongs: ApiViewModelSongs, id: String) {
 @Composable
 fun DescriptionSong(name: String, playcount: String, listeners: String, url: String) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.padding(top = 8.dp)
     ) {
         Spacer(modifier = Modifier.padding(4.dp))
         Text(
             text = name,
             textAlign = TextAlign.Left,
-            fontSize = 20.sp,
+            fontSize = 21.sp,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
@@ -192,26 +193,28 @@ fun DescriptionSong(name: String, playcount: String, listeners: String, url: Str
         )
         Spacer(modifier = Modifier.padding(4.dp))
         Text(
+            lineHeight = 3.sp,
             text = stringResource(R.string.playcount, playcount),
             textAlign = TextAlign.Left,
             fontSize = 10.sp,
             fontFamily = FontFamily.Monospace,
             color = AppColors.SecondaryTextColor
         )
-        Spacer(modifier = Modifier.padding(2.dp))
         Text(
+            lineHeight = 3.sp,
             text = stringResource(R.string.listeners, listeners),
             textAlign = TextAlign.Left,
             fontSize = 10.sp,
             fontFamily = FontFamily.Monospace,
             color = AppColors.SecondaryTextColor
         )
-        Spacer(modifier = Modifier.padding(2.dp))
         Text(
+            lineHeight = 3.sp,
             text = url,
             textAlign = TextAlign.Justify,
             fontSize = 10.sp,
             fontFamily = FontFamily.Monospace,
+            overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             color = AppColors.SecondaryTextColor
         )

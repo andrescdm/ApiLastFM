@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,12 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,13 +27,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -53,12 +53,28 @@ fun ContentPrincipalView(
 
     if (artistFMStates.isLoadingApi) {
         Column(
-            Modifier.fillMaxSize()
+            Modifier
+                .fillMaxSize()
                 .background(AppColors.BackgroundColor),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            //  LinearProgressIndicator()
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(50.dp)
+                    .align(Alignment.CenterHorizontally),
+                color = AppColors.CircularProgressColor,
+                strokeWidth = 4.dp
+            )
+            Spacer(modifier = Modifier.padding(4.dp))
+            Text(
+                text = stringResource(R.string.loading),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                fontSize = 20.sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                color = AppColors.PrimaryTextColor,
+            )
         }
     } else if (artistFMStates.topArtists != null) {
 
@@ -111,67 +127,57 @@ fun ItemArtist(
     artistFMArtist: Artist,
     navController: NavHostController,
 ) {
-    Box(
+    Card(shape = MaterialTheme.shapes.medium,
         modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .padding(8.dp)
-    ) {
-        Card(shape = MaterialTheme.shapes.medium,
-            modifier = Modifier
-                .clickable {
-                    navController.navigate(Routes.Screen2.createRoute(id = artistFMArtist.name)) {
-                        popUpTo(
-                            Routes.Screen2.createRoute(
-                                id = artistFMArtist.name
-                            )
-                        ) {
-                            inclusive = false
-                        }
+            .clickable {
+                navController.navigate(Routes.Screen2.createRoute(id = artistFMArtist.name)) {
+                    popUpTo(
+                        Routes.Screen2.createRoute(
+                            id = artistFMArtist.name
+                        )
+                    ) {
+                        inclusive = false
                     }
-
                 }
+
+            }
+            .height(80.dp)
+            .fillMaxWidth()
+            .padding(start = 8.dp,end = 8.dp)
+    )
+    {
+        Row(
+            modifier = Modifier
                 .height(80.dp)
                 .fillMaxWidth()
+                .background(AppColors.CardBackgroundColor)
         )
         {
-            Row(
+            Image(
+                painterResource(id = R.drawable.baseline_library_music_24),
+                contentDescription = stringResource(R.string.icon),
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(AppColors.CardBackgroundColor)
+                    .width(80.dp)
+                    .height(70.dp)
+                    .align(Alignment.CenterVertically),
             )
-            {
-                Image(
-                    painterResource(id = R.drawable.baseline_library_music_24),
-                    contentDescription = stringResource(R.string.icon),
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(70.dp)
-                        .align(Alignment.CenterVertically),
-
-                    )
-                /* AsyncImage(
-                     modifier = Modifier.fillMaxHeight(),
-                     model = artistFMArtist.image[1].text,
-                     contentDescription = stringResource(R.string.photo),
-                     contentScale = ContentScale.FillHeight
-                 )*/
-                Spacer(modifier = Modifier.padding(4.dp))
-                DescriptionArtist(
-                    name = artistFMArtist.name,
-                    listeners = artistFMArtist.listeners,
-                    url = artistFMArtist.url
-                )
-            }
+            Spacer(modifier = Modifier.padding(4.dp))
+            DescriptionArtist(
+                name = artistFMArtist.name,
+                listeners = artistFMArtist.listeners,
+                url = artistFMArtist.url
+            )
         }
     }
+
 }
 
 @Composable
 fun DescriptionArtist(name: String, listeners: String, url: String) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.padding(top = 8.dp)
     ) {
-        Spacer(modifier = Modifier.padding(4.dp))
+        Spacer(modifier = Modifier.padding(2.dp))
         Text(
             text = name,
             textAlign = TextAlign.Left,
@@ -180,34 +186,25 @@ fun DescriptionArtist(name: String, listeners: String, url: String) {
             fontWeight = FontWeight.Bold,
             color = AppColors.PrimaryTextColor
         )
-        Spacer(modifier = Modifier.padding(4.dp))
+        Spacer(modifier = Modifier.padding(2.dp))
         Text(
+            lineHeight = 3.sp,
             text = stringResource(R.string.listeners, listeners),
             textAlign = TextAlign.Left,
             fontSize = 10.sp,
-            fontFamily = FontFamily.Monospace,
+            fontFamily = FontFamily.SansSerif,
             color = AppColors.SecondaryTextColor
         )
-        Spacer(modifier = Modifier.padding(2.dp))
         Text(
+            lineHeight = 3.sp,
             text = url,
-            textAlign = TextAlign.Justify,
+            textAlign = TextAlign.Left,
             fontSize = 10.sp,
-            fontFamily = FontFamily.Monospace,
+            fontFamily = FontFamily.SansSerif,
             maxLines = 1,
             color = AppColors.SecondaryTextColor
         )
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun viewComposable() {
-    DescriptionArtist(
-        name = "andres",
-        listeners = "Diaz",
-        url = "www.andres.com.co"
-    )
 }
 
 @Composable
@@ -228,11 +225,13 @@ fun FetchArtistTopButton(apiViewModel: ApiViewModel) {
         )
         Spacer(modifier = Modifier.padding(8.dp))
         Button(
-            modifier = Modifier.background(AppColors.ButtonColor),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF00ACC1),
+                contentColor = AppColors.SecondaryTextColor
+            ),
             onClick = { apiViewModel.processIntent(LastFMArtistIntent.FetchArtistTop) }) {
             Text(
                 text = stringResource(R.string.retry_loading),
-                color = AppColors.SecondaryTextColor
             )
         }
     }

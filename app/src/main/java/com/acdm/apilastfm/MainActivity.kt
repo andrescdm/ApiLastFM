@@ -38,7 +38,6 @@ class MainActivity : ComponentActivity() {
                     ) { backStackEntry ->
                         ContentSecondaryScreen(
                             apiViewModelSongs,
-                            navController,
                             id = backStackEntry.arguments?.getString(Constans.ID) ?: ""
                         )
                     }

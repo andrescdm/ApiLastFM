@@ -14,8 +14,8 @@ object AppColors {
     // BOTONES
     val ButtonColor = Color(0xFF00ACC1)
 
+    //PROGRESS BAR
+    val CircularProgressColor = Color(0xFF00ACC1)
+
     // Colores para las Cards
     val CardBackgroundColor = Color(0xFF263238) // Azul Grisáceo Oscuro
-    val CardBorderColor = Color(0xFF37474F) // Gris Azulado
-    val CardShadowColor = Color(0x33000000) // Negro con 20% de Opacidad sombra)
-}
