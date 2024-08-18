@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -121,7 +123,7 @@ fun ItemSongs(
         modifier = Modifier
             .height(100.dp)
             .fillMaxWidth()
-            .padding(start = 8.dp,end = 8.dp)
+            .padding(start = 8.dp, end = 8.dp)
     )
     {
         Row(
@@ -169,9 +171,15 @@ fun FetchSongsTopButton(apiViewModelSongs: ApiViewModelSongs, id: String) {
             color = AppColors.PrimaryTextColor
         )
         Spacer(modifier = Modifier.padding(8.dp))
-        Button(modifier = Modifier.background(AppColors.ButtonColor),
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF00ACC1),
+                contentColor = AppColors.SecondaryTextColor
+            ),
             onClick = { apiViewModelSongs.processIntent(LastFMSongIntent.FetchSongsTop(id)) }) {
-            Text(text = stringResource(R.string.retry_loading))
+            Text(
+                text = stringResource(R.string.retry_loading)
+            )
         }
     }
 }

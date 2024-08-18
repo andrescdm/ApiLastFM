@@ -19,3 +19,5 @@ object AppColors {
 
     // Colores para las Cards
     val CardBackgroundColor = Color(0xFF263238) // Azul Grisáceo Oscuro
+
+}
